@@ -1,0 +1,65 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sky Courier: Island Run</title>
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #0a1622; }
+  #game { position: fixed; inset: 0; width: 100%; height: 100%; display: block; touch-action: none; }
+  #hud { position: fixed; inset: 0; width: 100%; height: 100%; display: block; pointer-events: none; }
+  /* Read aloud, never shown: the status line screen readers announce. */
+  #status { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  #overlay {
+    position: fixed; inset: 0; display: flex; align-items: center; justify-content: center;
+    background: linear-gradient(180deg, rgba(6, 18, 32, 0.55), rgba(6, 18, 32, 0.78));
+    font-family: system-ui, -apple-system, 'Segoe UI', sans-serif; color: #eaf4ff; z-index: 5;
+  }
+  #overlay-card {
+    max-width: 640px; margin: 24px; padding: 32px 36px; border: 1px solid rgba(234, 244, 255, 0.35);
+    border-radius: 12px; background: rgba(8, 20, 34, 0.82); text-align: center;
+  }
+  #overlay-title { margin: 0 0 12px; font-size: 34px; letter-spacing: 0.06em; color: #ffb02e; }
+  #overlay-body { margin: 0 0 18px; font-size: 15px; line-height: 1.55; color: #cfe0ee; }
+  #overlay-hint { margin: 0; font-size: 13px; color: #9db8cc; }
+  #overlay-missions { display: flex; gap: 10px; justify-content: center; margin: 0 0 18px; }
+  .mission-btn {
+    flex: 1; padding: 10px 8px; border: 1px solid rgba(234, 244, 255, 0.4); border-radius: 8px;
+    background: rgba(255, 176, 46, 0.12); color: #eaf4ff; font: 600 13px system-ui, sans-serif; cursor: pointer;
+  }
+  .mission-btn:hover { background: rgba(255, 176, 46, 0.3); }
+</style>
+</head>
+<body>
+<canvas id="game" aria-label="Sky Courier: Island Run — fly the Kestrel-9 mail plane over the Merak archipelago"></canvas>
+<canvas id="hud" aria-hidden="true"></canvas>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="overlay">
+  <div id="overlay-card">
+    <h1 id="overlay-title">SKY COURIER: ISLAND RUN</h1>
+    <p id="overlay-body"></p>
+    <div id="overlay-missions">
+      <button class="mission-btn" data-mission="1">1 · Ring Run</button>
+      <button class="mission-btn" data-mission="2">2 · Island Hop</button>
+      <button class="mission-btn" data-mission="3">3 · Storm Courier</button>
+    </div>
+    <p id="overlay-hint"></p>
+  </div>
+</div>
+<script type="importmap">
+{ "imports": { "three": "./vendor/three/three.module.min.js" } }
+</script>
+<script type="module" src="./src/main.js"></script>
+<script>
+  // The overlay's mission buttons call into the game through keys: pressing
+  // 1, 2 or 3 on the title screen starts that mission. A click dispatches
+  // the same key so mouse players get the same path as keyboard players.
+  document.querySelectorAll('.mission-btn').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      window.dispatchEvent(new KeyboardEvent('keydown', { code: 'Digit' + btn.dataset.mission }));
+      window.dispatchEvent(new KeyboardEvent('keyup', { code: 'Digit' + btn.dataset.mission }));
+    });
+  });
+</script>
+</body>
+</html>
